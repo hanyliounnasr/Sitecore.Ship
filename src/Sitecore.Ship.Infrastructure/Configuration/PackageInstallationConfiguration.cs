@@ -11,6 +11,7 @@ namespace Sitecore.Ship.Infrastructure.Configuration
         const string RecordInstallationHistoryKey = "recordInstallationHistory";
         const string WhitelistElementName = "Whitelist";
         const string MuteAuthorisationFailureLoggingKey = "muteAuthorisationFailureLogging";
+        const string ExecutionTimeoutKey = "executionTimeout";
 
         public static PackageInstallationConfiguration GetConfiguration()
         {
@@ -29,6 +30,9 @@ namespace Sitecore.Ship.Infrastructure.Configuration
 
         [ConfigurationProperty(RecordInstallationHistoryKey, IsRequired = false, DefaultValue = false)]
         public bool RecordInstallationHistory { get { return (bool)this[RecordInstallationHistoryKey]; } }
+
+        [ConfigurationProperty(ExecutionTimeoutKey, IsRequired = false, DefaultValue = 600)]
+        public int ExecutionTimeout { get { return (int)this[ExecutionTimeoutKey]; } }
         
         [ConfigurationProperty(WhitelistElementName)]
         public WhitelistCollection Whitelist
