@@ -1,7 +1,6 @@
 ﻿using System.Web;
 using Sitecore.Ship.AspNet.Package;
 using Sitecore.Ship.AspNet.Publish;
-using Sitecore.Ship.Core.Domain;
 
 namespace Sitecore.Ship.AspNet
 {

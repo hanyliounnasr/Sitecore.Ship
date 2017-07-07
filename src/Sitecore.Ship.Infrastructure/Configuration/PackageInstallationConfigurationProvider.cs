@@ -16,7 +16,7 @@ namespace Sitecore.Ship.Infrastructure.Configuration
                                AllowPackageStreaming = config.AllowPackageStreaming,
                                RecordInstallationHistory = config.RecordInstallationHistory,
                                MuteAuthorisationFailureLogging = config.MuteAuthorisationFailureLogging,
-                               ExecutionTimeout = config.ExecutionTimeout,
+                               ExecutionTimeout = config.ExecutionTimeout
                            };
 
             if (config.Whitelist.Count > 0)
