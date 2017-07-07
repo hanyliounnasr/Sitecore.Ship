@@ -41,6 +41,7 @@ namespace Sitecore.Ship.AspNet
             }
 
             context.Items.Add(StartTime, DateTime.UtcNow);
+            context.Server.ScriptTimeout = new PackageInstallationConfigurationProvider().Settings.ExecutionTimeout;
 
             try
             {

@@ -1,7 +1,6 @@
 ﻿using System.Web;
 using Sitecore.Ship.AspNet.Package;
 using Sitecore.Ship.AspNet.Publish;
-using Sitecore.Ship.Infrastructure.Configuration;
 using Sitecore.Ship.Core.Domain;
 
 namespace Sitecore.Ship.AspNet
@@ -9,12 +8,10 @@ namespace Sitecore.Ship.AspNet
     public class SitecoreShipHttpHandler : BaseHttpHandler
     {
         private readonly CommandHandler _commandChain;
-        private readonly PackageInstallationSettings _settings;
 
         public SitecoreShipHttpHandler()
         {
             // TODO move this construction logic out of here ...
-            _settings = new PackageInstallationConfigurationProvider().Settings;
 
             var aboutCommand = new AboutCommand();
 
@@ -47,7 +44,6 @@ namespace Sitecore.Ship.AspNet
 
         public override void ProcessRequest(HttpContextBase context)
         {
-            context.Server.ScriptTimeout = _settings.ExecutionTimeout;
             _commandChain.HandleRequest(context);
         }
     }
