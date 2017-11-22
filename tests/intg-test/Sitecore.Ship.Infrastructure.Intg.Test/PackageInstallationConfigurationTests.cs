@@ -44,6 +44,12 @@ namespace Sitecore.Ship.Infrastructure.Intg.Test
         }
 
         [Fact]
+        public void PackageInstallation_executionTimeout_should_equal_600()
+        {
+            _section.ExecutionTimeout.ShouldEqual(600);
+        }
+
+        [Fact]
         public void PackageInstallation_whitelist_can_be_read()
         {
             _section.Whitelist.ShouldNotBeNull();

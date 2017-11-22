@@ -37,9 +37,11 @@ namespace Sitecore.Ship.AspNet
             if (!_authoriser.IsAllowed())
             {
                 context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                return;
             }
 
             context.Items.Add(StartTime, DateTime.UtcNow);
+            context.Server.ScriptTimeout = new PackageInstallationConfigurationProvider().Settings.ExecutionTimeout;
 
             try
             {

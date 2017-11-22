@@ -1,181 +1,250 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
+HOST: http://docs.sitecoreship.apiary.io/
 
 # Sitecore.Ship
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+The package offers a simple API to help consumers install their packages into Sitecore over HTTP.
 
-# Polls API Root [/]
+## Sitecore.Ship Information [/services/about]
 
-This resource does not have any attributes. Instead it offers the initial
-API affordances in the form of the links in the JSON body.
+### About [GET]
 
-It is recommend to follow the “url” link values,
-[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
-applicable to retrieve resources. Instead of constructing your own URLs,
-to keep your client decoupled from implementation details.
-
-## Retrieve the Entry Point [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "questions_url": "/questions"
-        }
-
-## Group Question
-
-Resources related to questions in the API.
-
-## Question [/questions/{question_id}]
-
-A Question object has the following attributes:
-
-+ question
-+ published_at - An ISO8601 date when the question was published.
-+ url
-+ choices - An array of Choice objects.
-
-+ Parameters
-    + question_id: 1 (required, number) - ID of the Question in form of an integer
-
-### View a Questions Detail [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "question": "Favourite programming language?",
-            "published_at": "2014-11-11T08:40:51.620Z",
-            "url": "/questions/1",
-            "choices": [
-                {
-                    "choice": "Swift",
-                    "url": "/questions/1/choices/1",
-                    "votes": 2048
-                }, {
-                    "choice": "Python",
-                    "url": "/questions/1/choices/2",
-                    "votes": 1024
-                }, {
-                    "choice": "Objective-C",
-                    "url": "/questions/1/choices/3",
-                    "votes": 512
-                }, {
-                    "choice": "Ruby",
-                    "url": "/questions/1/choices/4",
-                    "votes": 256
-                }
-            ]
-        }
-
-## Choice [/questions/{question_id}/choices/{choice_id}]
-
-+ Parameters
-    + question_id: 1 (required, number) - ID of the Question in form of an integer
-    + choice_id: 1 (required, number) - ID of the Choice in form of an integer
-
-### Vote on a Choice [POST]
-
-This action allows you to vote on a question's choice.
-
-+ Response 201
-
-    + Headers
-
-            Location: /questions/1
-
-## Questions Collection [/questions{?page}]
-
-+ Parameters
-    + page: 1 (optional, number) - The page of questions to return
-
-### List All Questions [GET]
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            Link: </questions?page=2>; rel="next"
++ Response 200 (text/plain)
 
     + Body
 
-            [
-                {
-                    "question": "Favourite programming language?",
-                    "published_at": "2014-11-11T08:40:51.620Z",
-                    "url": "/questions/1",
-                    "choices": [
-                        {
-                            "choice": "Swift",
-                            "url": "/questions/1/choices/1",
-                            "votes": 2048
-                        }, {
-                            "choice": "Python",
-                            "url": "/questions/1/choices/2",
-                            "votes": 1024
-                        }, {
-                            "choice": "Objective-C",
-                            "url": "/questions/1/choices/3",
-                            "votes": 512
-                        }, {
-                            "choice": "Ruby",
-                            "url": "/questions/1/choices/4",
-                            "votes": 256
-                        }
-                    ]
-                }
-            ]
+            Sitecore.Ship - version 0.4.0.0
 
-### Create a New Question [POST]
 
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+## Package Installation [/services/package]
 
-+ question (string) - The question
-+ choices (array[string]) - A collection of choices.
+### Install Package [POST /services/package/install]
 
-+ Request (application/json)
++ Request (multipart/form-data;boundary=----WebKitFormBoundary8M3sSU13ul5lXSJm)
 
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
-        }
+        Install a package by specifying a package available on the server.
+
+        Specify the request parameters in x-www-form-urlencoded form-data.
+
+    + Headers
+
+            Accept: application/json
+            
+    + Attributes (object)
+
+        + path: d:\package.update (string, required) - The path to the package file.
+        
+        + DisableIndexing: false (boolean, optional) - Disables Indexing during publish operation. Value is `false` by default. When the parameter is set to *true* updating of search indexes during the package installation will be suspended. Disabling the search index updates will increase the speed at which packages are installed into the CMS. You can read more about this approach on Alex Shyba's 
+[blog](http://sitecoreblog.alexshyba.com/2010/04/sitecore-installation-wizard-disable.html "Sitecore Installation Wizard – disable search index update during install")
+
+
+    + Body
+
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+            Content-Disposition: form-data; name="path"
+    
+            d:\package.update
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+            
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /services/package/latestversion
+
+    + Body
+
+            { "Entries" : [ {  "ID" : "110d559f-dea5-42ea-9c1c-8a5df7e70ef9", "Path" : "addeditems/master/sitecore/content/home" } ] }
+
+
+
+### Upload and Install Package [POST /services/package/install/fileupload]
+
++ Request (multipart/form-data;boundary=----WebKitFormBoundary8M3sSU13ul5lXSJm)
+
+        Upload and install a package by specifying a package to upload to the server and install into the Sitecore instance.
+
+        Specify the request parameters in x-www-form-urlencoded form-data.
+
+        *Note* that if you have `recordInstallationHistory` enabled you will need to provide `PackageId` and `Description` form parameters in the request that you make.
+
+    + Headers
+
+            Accept: application/json
+            
+    + Attributes (object)
+
+        + path: package.update (string, required) - The path to the package file.
+        
+        + DisableIndexing: false (boolean, optional) - Disables Indexing during publish operation. Value is `false` by default.
+
+    + Body
+
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+            Content-Disposition: form-data; name="path"; filename="package.update"
+            Content-Type: 
+            
+            
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+
++ Response 404
+
+    + Headers
+
+            x-processing-time: 0
 
 + Response 201 (application/json)
 
     + Headers
 
-            Location: /questions/2
+            Location: /services/package/latestversion
+            x-processing-time: 9984.2635
+
+    + Body
+
+            { "Entries": 
+               [
+                   {"ID":"4717ac43-bb10-4673-92bf-5e9e2a191147","Path":"items/master/sitecore/templates/SitecoreShip"},
+                   {"ID":"4717ac43-bb10-4673-92bf-5e9e2a191147","Path":"properties/items/master/sitecore/templates/SitecoreShip"},
+                   {"ID":"c2b9b6c7-5f2f-4638-9a1c-244557be959e","Path":"items/master/sitecore/templates/SitecoreShip/InstalledPackage"},
+                   {"ID":"c2b9b6c7-5f2f-4638-9a1c-244557be959e","Path":"properties/items/master/sitecore/templates/SitecoreShip/InstalledPackage"},
+                   {"ID":"8bbbddb4-d98c-42e7-b555-1467c84aca6d","Path":"items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data"},
+                   {"ID":"8bbbddb4-d98c-42e7-b555-1467c84aca6d","Path":"properties/items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data"},
+                   {"ID":"463b0ac2-b6d3-42f1-8082-86f56ab2d7d7","Path":"items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data/DateInstalled"},
+                   {"ID":"463b0ac2-b6d3-42f1-8082-86f56ab2d7d7","Path":"properties/items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data/DateInstalled"},{"ID":"c00c438e-a5ab-4098-8107-1c59cd667404","Path":"items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data/Description"},
+                   {"ID":"c00c438e-a5ab-4098-8107-1c59cd667404","Path":"properties/items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data/Description"},
+                   {"ID":"d26968d3-dcee-449f-857a-d3253785761b","Path":"items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data/PackageId"},
+                   {"ID":"d26968d3-dcee-449f-857a-d3253785761b","Path":"properties/items/master/sitecore/templates/SitecoreShip/InstalledPackage/Data/PackageId"},
+                   {"ID":"ce433442-9cee-4626-860a-17a19de19810","Path":"items/master/sitecore/content/PackageHistory"},
+                   {"ID":"ce433442-9cee-4626-860a-17a19de19810","Path":"properties/items/master/sitecore/content/PackageHistory"}
+                ]   
+            }
+
+### Package Installation Report [GET /services/package/latestversion]
+
++ Request
+
+        Reports the details of the last package to have been installed by the Sitecore.Ship.
+
+        Note that latest version reporting is disabled by default. Refer to the `recordInstallationHistory` setting in the **Configuration Options** section of the project [README](README.md) file.
+
++ Response 204
+
+    + Headers
+
+            x-processing-time: 42.3033
+
++ Response 200 (application/json)
+
+    + Headers
+
+            x-processing-time: 10.0345
+
+    + Body
+    
+            {
+                "installedPackage": 
+                {
+                       "PackageId": "01",
+                       "DateInstalled": "\/Date(1468839035000)\/",
+                       "Description":"package"
+                }
+            }
+
+## Publishing [/services/publish]
+
+### Sitecore Content Publish [POST /services/publish/{mode}]
+
++ Parameters
+
+    + mode: full (required, string) - Sitecore publishing mode. Valid values are `full`, `smart` and `incremental`.
+    
+
++ Request (multipart/form-data;boundary=----WebKitFormBoundary8M3sSU13ul5lXSJm)
+
+    + Headers
+
+            Accept: application/json
+            
+    + Attributes (object)
+
+        + source: master (string, optional) - The publishing source.
+        
+        + targets: web (string, optional) - The publishing targets.
+
+        + languages: en (string, optional) - The publishing languages.
+
+    + Body
+
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+            Content-Disposition: form-data; name="source"
+            
+            master
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+            Content-Disposition: form-data; name="targets"
+            
+            web, target2
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+            Content-Disposition: form-data; name="languages"
+            
+            en, da, de-DE
+            ----WebKitFormBoundaryE19zNvXGzXaLvS5C
+
++ Response 202 (application/json)
+
+    + Headers
+    
+             x-processing-time: 7.9582
 
     + Body
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2014-11-11T08:40:51.620Z",
-                "url": "/questions/2",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "url": "/questions/2/choices/1",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "url": "/questions/2/choices/2",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "url": "/questions/2/choices/3",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "url": "/questions/2/choices/4",
-                        "votes": 0
-                    }
-                ]
+                "date": "\/Date(1468830267000)\/"
+            }
+
+
+### Publish Specified Items [POST /services/publish/listofitems] 
+
++ Request (application/json)
+
+        {
+            "Items": [
+                      {
+                          "itemId" : "{DEDCC8EB-F542-449C-9EFA-4F248EDB900B}",
+                          "PublishChildren": "false"
+                      },
+                      {
+                          "itemId" : "{CE0A2933-AB9B-4131-ABD2-DE7C2A69FBB9}",
+                          "PublishChildren": "false"
+                      }
+                     ],
+            "TargetDatabases": [ "#TargetDatabase#" ],
+            "TargetLanguages": [ "en" ]
+        }
+
++ Response 200 (application/json)
+
+### Last Publish Operation [GET /services/publish/lastcompleted/{source}/{target}/{language}]
+
++ Parameters
+
+    + source: `master` (optional, string) - The publishing source.
+        + Default: `master`
+        
+    + target: `web` (optional, string) - The publishing targets.
+        + Default: `web`
+      
+    + language: `en` (optional, string) - The publishing language.
+        + Default: `en`
+      
++ Response 202 (application/json)
+
+    + Headers
+    
+            x-processing-time: 1.4947
+            
+    + Body
+
+            {
+                "date": "\/Date(-62135596800000)\/"
             }
